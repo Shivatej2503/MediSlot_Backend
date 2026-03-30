@@ -17,25 +17,25 @@ connectDB();
 const app = express();
 
 // --------------------
-// 1. CORS Configuration
+// 1. CORS Configuration (FIXED)
 // --------------------
-// We use an array to prevent "trailing slash" or protocol mismatches
 const allowedOrigins = [
-  "https://medslot.netlify.app",
-  "https://medslot.netlify.app/",
-  "http://localhost:5173", // For local development
+  "https://medslot.netlify.app", // ✅ your frontend
+  "http://localhost:5173",       // ✅ local dev
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or Postman/Curl)
+      console.log("Incoming Origin:", origin); // 🔍 debug
+
+      // Allow requests with no origin (Postman, mobile apps)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
-        callback(null, true);
+        return callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, false); // ✅ don't throw error
       }
     },
     credentials: true,
@@ -43,6 +43,9 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// ✅ Handle preflight requests (VERY IMPORTANT)
+app.options("*", cors());
 
 // --------------------
 // 2. Standard Middleware
@@ -56,13 +59,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health Check Route
 app.get("/", (req, res) => {
-  res.status(200).json({ 
-    success: true, 
-    message: "MediSlot API is Running 🚀" 
+  res.status(200).json({
+    success: true,
+    message: "MediSlot API is Running 🚀",
   });
 });
 
-// Mounted Routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/users", userRoutes);
@@ -71,11 +74,11 @@ app.use("/api/users", userRoutes);
 // 4. Global Error Handler
 // --------------------
 app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode).json({
+  console.error("Error:", err.message);
+
+  res.status(500).json({
     success: false,
     message: err.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 });
 
