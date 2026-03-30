@@ -21,8 +21,8 @@ const app = express();
 // --------------------
 // We use an array to prevent "trailing slash" or protocol mismatches
 const allowedOrigins = [
-  "https://medislot.netlify.app",
-  "https://medislot.netlify.app/",
+  "https://medslot.netlify.app",
+  "https://medslot.netlify.app/",
   "http://localhost:5173", // For local development
 ];
 
