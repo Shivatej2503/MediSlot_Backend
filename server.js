@@ -16,7 +16,7 @@ const app = express();
 // --------------------
 app.use(
   cors({
-    origin: "http://localhost:5173", // Vite frontend
+    origin: "https://medislot.netlify.app", // Vite frontend
     credentials: true,
   })
 );
